@@ -91,6 +91,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
         all_graphs    = c( rep ( 0, iter - burnin ) )         # vector of numbers like "10100"
         all_weights   = c( rep ( 1, iter - burnin ) )         # waiting time for every state		
         size_sample_g = 0
+        K_samples <- double( (iter - burnin) * p * p ) ## NEW
     }else{
         p_links = matrix( 0, p, p )
     }
@@ -134,7 +135,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
             result = .C( "ggm_bdmcmc_map", as.integer(iter), as.integer(burnin), G = as.integer(G), as.double(g_prior), as.double(Ts), K = as.double(K), as.integer(p), as.double(threshold), 
                          all_graphs = as.integer(all_graphs), all_weights = as.double(all_weights), K_hat = as.double(K_hat), 
                          sample_graphs = as.character(sample_graphs), graph_weights = as.double(graph_weights), size_sample_g = as.integer(size_sample_g),
-                         as.integer(b), as.integer(b_star), as.double(Ds), as.integer(trace_mcmc), PACKAGE = "BDgraph" )
+                         as.integer(b), as.integer(b_star), as.double(Ds), as.integer(trace_mcmc), K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
         }
         
         if( ( method == "ggm" ) && ( algorithm == "bdmcmc" ) && ( jump != 1 ) )
@@ -151,7 +152,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
             result = .C( "ggm_rjmcmc_map", as.integer(iter), as.integer(burnin), G = as.integer(G), as.double(g_prior), as.double(Ts), K = as.double(K), as.integer(p), as.double(threshold), 
                          all_graphs = as.integer(all_graphs), all_weights = as.double(all_weights), K_hat = as.double(K_hat), 
                          sample_graphs = as.character(sample_graphs), graph_weights = as.double(graph_weights), size_sample_g = as.integer(size_sample_g),
-                         as.integer(b), as.integer(b_star), as.double(Ds), as.integer(trace_mcmc), PACKAGE = "BDgraph" )
+                         as.integer(b), as.integer(b_star), as.double(Ds), as.integer(trace_mcmc), K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
         }
         
         if( ( method == "gcgm" ) && ( algorithm == "bdmcmc" ) && ( jump == 1 ) )
@@ -162,7 +163,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
                          as.double(Z), as.integer(R), as.integer(not_continuous), as.integer(n), as.integer(gcgm_NA),
                          all_graphs = as.integer(all_graphs), all_weights = as.double(all_weights), K_hat = as.double(K_hat), 
                          sample_graphs = as.character(sample_graphs), graph_weights = as.double(graph_weights), size_sample_g = as.integer(size_sample_g),
-                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), PACKAGE = "BDgraph" )
+                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
         }
         
         if( ( method == "gcgm" ) && ( algorithm == "bdmcmc" ) && ( jump != 1 ) )
@@ -185,7 +186,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
                          as.double(Z), as.integer(R), as.integer(not_continuous), as.integer(n), as.integer(gcgm_NA),
                          all_graphs = as.integer(all_graphs), all_weights = as.double(all_weights), K_hat = as.double(K_hat), 
                          sample_graphs = as.character(sample_graphs), graph_weights = as.double(graph_weights), size_sample_g = as.integer(size_sample_g),
-                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), PACKAGE = "BDgraph" )
+                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
         }	
         
         # for Double Metropolis-Hasting 
@@ -380,6 +381,8 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
         graph_weights = result $ graph_weights[ 1 : size_sample_g ]
         all_graphs    = result $ all_graphs + 1
         all_weights   = result $ all_weights
+        K_samples_mat <- matrix(result$K_samples, nrow = (iter - burnin), ncol = p * p, byrow = TRUE)
+        
         if( ( jump != 1 ) & ( algorithm != "rjmcmc" ) & ( algorithm != "rj-dmh" ) )
         { 
             all_weights = all_weights[ 1 : ( result $ counter_all_g ) ]
@@ -388,7 +391,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
         
         output = list( sample_graphs = sample_graphs, graph_weights = graph_weights, K_hat = K_hat, 
                        all_graphs = all_graphs, all_weights = all_weights, last_graph = last_graph, last_K = last_K,
-                       data = data, method = method )
+                       data = data, method = method, K_samples_mat = K_samples_mat)
     }else{
         p_links = matrix( result $ p_links, p, p, dimnames = list( colnames_data, colnames_data ) ) 
         

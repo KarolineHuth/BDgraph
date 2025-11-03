@@ -230,7 +230,8 @@ void ggm_rjmcmc_map( int *iter, int *burnin, int G[], double g_prior[], double T
                     int *p, double *threshold, 
                     int all_graphs[], double all_weights[], double K_hat[], 
                     char *sample_graphs[], double graph_weights[], int *size_sample_g,
-                    int *b, int *b_star, double Ds[], int *print )
+                    int *b, int *b_star, double Ds[], int *print, 
+                    double K_samples[])
 {
 	int print_c = *print, iteration = *iter, burn_in = *burnin, count_all_g = 0;
 	int selected_edge, selected_edge_i, selected_edge_j, size_sample_graph = *size_sample_g;
@@ -360,6 +361,10 @@ void ggm_rjmcmc_map( int *iter, int *burnin, int G[], double g_prior[], double T
 		
 			for( i = 0; i < pxp ; i++ ) K_hat[ i ] += K[ i ];	
 
+			// *** NEW: save full K sample ***
+			for( int i = 0; i < pxp; i++ )
+			  K_samples[ count_all_g * pxp + i ] = K[ i ];
+			
 			string_g = string( char_g.begin(), char_g.end() );	
 			
 			this_one = false;
@@ -553,7 +558,8 @@ void gcgm_rjmcmc_map( int *iter, int *burnin, int G[], double g_prior[], double 
                     double Z[], int R[], int not_continuous[], int *n, int *gcgm,
                     int all_graphs[], double all_weights[], double K_hat[], 
                     char *sample_graphs[], double graph_weights[], int *size_sample_g,
-                    int *b, int *b_star, double D[], double Ds[], int *print )
+                    int *b, int *b_star, double D[], double Ds[], int *print, 
+                    double K_samples[])
 {
 	int print_c = *print, iteration = *iter, burn_in = *burnin, count_all_g = 0;
 	int selected_edge, counter, selected_edge_i, selected_edge_j, size_sample_graph = *size_sample_g;
@@ -692,6 +698,10 @@ void gcgm_rjmcmc_map( int *iter, int *burnin, int G[], double g_prior[], double 
 		
 			for( i = 0; i < pxp ; i++ ) K_hat[ i ] += K[ i ];	
 
+			// *** NEW: save full K sample ***
+			for( int i = 0; i < pxp; i++ )
+			  K_samples[ count_all_g * pxp + i ] = K[ i ];
+			
 			string_g = string( char_g.begin(), char_g.end() );	
 			
 			this_one = false;
