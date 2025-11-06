@@ -382,7 +382,24 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
         graph_weights = result $ graph_weights[ 1 : size_sample_g ]
         all_graphs    = result $ all_graphs + 1
         all_weights   = result $ all_weights
+        # -----------------------
+        # New code extracting the posterior samples of the precision matrix K
         K_samples_mat <- matrix(result$K_samples, nrow = (iter - burnin), ncol = p * p, byrow = TRUE)
+      
+        # Code to turn precision matrix to partial correlation
+        n_samples <- nrow(K_samples_mat)
+        partial_cor_mat <- matrix(NA, nrow = n_samples, ncol = p * (p - 1) / 2)
+        K_to_partial <- function(K) {
+          P <- -cov2cor(K)  
+          diag(P) <- 1
+          return(P)
+        }
+        for (i in seq_len(n_samples)) {
+          P <- K_to_partial(matrix(K_samples_mat[i, ], nrow = p, ncol = p))
+          partial_cor_mat[i, ] <- P[upper.tri(P)]
+        }
+        
+        # -----------------------
         
         if( ( jump != 1 ) & ( algorithm != "rjmcmc" ) & ( algorithm != "rj-dmh" ) )
         { 
@@ -392,7 +409,7 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
         
         output = list( sample_graphs = sample_graphs, graph_weights = graph_weights, K_hat = K_hat, 
                        all_graphs = all_graphs, all_weights = all_weights, last_graph = last_graph, last_K = last_K,
-                       data = data, method = method, K_samples_mat = K_samples_mat)
+                       data = data, method = method, K_samples = K_samples_mat, partial_cor_samples = partial_cor_mat)
     }else{
         p_links = matrix( result $ p_links, p, p, dimnames = list( colnames_data, colnames_data ) ) 
         
