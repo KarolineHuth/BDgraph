@@ -163,7 +163,8 @@ bdgraph = function( data, n = NULL, method = "ggm", algorithm = "bdmcmc", iter =
                          as.double(Z), as.integer(R), as.integer(not_continuous), as.integer(n), as.integer(gcgm_NA),
                          all_graphs = as.integer(all_graphs), all_weights = as.double(all_weights), K_hat = as.double(K_hat), 
                          sample_graphs = as.character(sample_graphs), graph_weights = as.double(graph_weights), size_sample_g = as.integer(size_sample_g),
-                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
+                         as.integer(b), as.integer(b_star), as.double(D), as.double(Ds), as.integer(trace_mcmc), 
+                         K_samples = as.double(K_samples), PACKAGE = "BDgraph" )
         }
         
         if( ( method == "gcgm" ) && ( algorithm == "bdmcmc" ) && ( jump != 1 ) )

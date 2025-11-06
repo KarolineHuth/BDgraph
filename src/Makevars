@@ -1,2 +1,5 @@
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+# needs to be added for computers running on newer macOS (Not might have to adapt package version 15.2.0 to your respective one)
+#PKG_LIBS += -L/opt/homebrew/Cellar/gcc/15.2.0/lib/gcc/current/gcc/aarch64-apple-darwin24/15
+# 
